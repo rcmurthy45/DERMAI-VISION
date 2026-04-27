@@ -1,0 +1,6 @@
+{
+  "name": "DermAI - AI-Powered Skin & Nail Health Explorer",
+  "description": "A multimodal application using 3D visualization and Gemini AI to analyze skin and nail conditions through text and images.",
+  "requestFramePermissions": ["camera", "microphone", "geolocation"],
+  "majorCapabilities": ["multimodal_analysis", "3d_visualization", "data_visualization"]
+}

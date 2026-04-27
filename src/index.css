@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --color-bg: #050608;
+  --color-surface: #11141a;
+  --color-surface-accent: #1c212b;
+  --color-border-main: #2d3442;
+  --color-accent-blue: #00f2fe;
+  --color-text-main: #e2e8f0;
+  --color-text-dim: #94a3b8;
+}
+
+@layer base {
+  body {
+    @apply bg-bg text-text-main antialiased;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-surface/80 backdrop-blur-md border border-border-main;
+  }
+  
+  .card-premium {
+    @apply bg-surface border border-border-main rounded-2xl p-6 shadow-xl overflow-hidden;
+  }
+
+  .accent-glow {
+    box-shadow: 0 0 40px rgba(0, 242, 254, 0.15);
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+
+  .animate-shake {
+    animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-bg;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-border-main rounded-full hover:bg-surface-accent transition-colors;
+}

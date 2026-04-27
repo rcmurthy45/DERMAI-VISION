@@ -1,0 +1,46 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Stores user demographics and preferences",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "name": { "type": "string" },
+        "age": { "type": "number" },
+        "foodHabits": { "type": "string" },
+        "lifestyle": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "name"]
+    },
+    "Diagnosis": {
+      "title": "Diagnosis Result",
+      "description": "Results of multimodal skin/nail analysis",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "diseaseName": { "type": "string" },
+        "confidence": { "type": "number" },
+        "explanation": { "type": "string" },
+        "medications": { "type": "string" },
+        "precautions": { "type": "string" },
+        "symptoms": { "type": "array", "items": { "type": "string" } },
+        "imageUrl": { "type": "string" },
+        "voiceText": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "diseaseName", "confidence"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "User profile document"
+    },
+    "diagnoses/{diagnosisId}": {
+      "schema": "Diagnosis",
+      "description": "Historical diagnosis records"
+    }
+  }
+}

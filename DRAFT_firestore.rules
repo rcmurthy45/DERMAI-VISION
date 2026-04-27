@@ -1,0 +1,73 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helpers
+    function isSignedIn() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 64 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation Blueprints
+    function isValidUser(data) {
+      return data.uid == request.auth.uid
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 100
+        && (data.age == null || data.age is number)
+        && (data.foodHabits == null || data.foodHabits is string && data.foodHabits.size() <= 1000)
+        && (data.lifestyle == null || data.lifestyle is string && data.lifestyle.size() <= 1000)
+        && data.createdAt == request.time
+        && data.keys().hasAll(['uid', 'name', 'createdAt'])
+        && data.keys().size() <= 6;
+    }
+
+    function isValidDiagnosis(data) {
+      return data.userId == request.auth.uid
+        && data.diseaseName is string && data.diseaseName.size() <= 200
+        && data.confidence is number && data.confidence >= 0 && data.confidence <= 100
+        && data.explanation is string && data.explanation.size() <= 2000
+        && data.medications is string && data.medications.size() <= 2000
+        && data.precautions is string && data.precautions.size() <= 2000
+        && data.symptoms is list && data.symptoms.size() <= 20
+        && (data.imageUrl == null || data.imageUrl is string && data.imageUrl.size() <= 1000)
+        && data.createdAt == request.time
+        && data.keys().hasAll(['userId', 'diseaseName', 'confidence', 'explanation', 'medications', 'precautions', 'symptoms', 'createdAt'])
+        && data.keys().size() <= 10;
+    }
+
+    // Collections
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(incoming());
+      allow update: if isOwner(userId) && isValidUser(incoming()) 
+        && incoming().diff(existing()).affectedKeys().hasOnly(['name', 'age', 'foodHabits', 'lifestyle']);
+    }
+
+    match /diagnoses/{diagnosisId} {
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(diagnosisId) && isValidDiagnosis(incoming());
+      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+    }
+  }
+}
